@@ -42,6 +42,8 @@ public class Bunga {
 
         bungaAtas.setX(x + batangAtas.width/2);
         batangAtas.setX(x);
+
+        //Todo: make looping for spawn next obstacle
     }
 
     public void update(float delta){
