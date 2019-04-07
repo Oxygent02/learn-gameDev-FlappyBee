@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -13,6 +14,8 @@ public class Bunga {
     private static final float RADIUS_BUNGA = 33f;
     private static final float GAP = 225f;
     private static final float KECEPATAN_BUNGA = 100f;
+
+    public static final float WIDTH = RADIUS_BUNGA * 2;
 
     private float x = 0;
     private float y = 0;
@@ -36,6 +39,10 @@ public class Bunga {
         updatePosisiBunga();
     }
 
+    public float getX() {
+        return x;
+    }
+
     private void updatePosisiBunga(){
         bungaBawah.setX(x + batangBawah.width/2);
         batangBawah.setX(x);
@@ -55,6 +62,15 @@ public class Bunga {
         shape.rect(batangBawah.x,batangBawah.y,batangBawah.width,batangBawah.height);
         shape.circle(bungaAtas.x,bungaAtas.y,RADIUS_BUNGA);
         shape.rect(batangAtas.x,batangAtas.y,batangAtas.width,batangAtas.height);
+    }
+
+    public boolean isTawonKenak(Tawon tawon){
+        Circle tawonShape = tawon.getBody();
+        return
+        Intersector.overlaps(tawonShape,bungaAtas) ||
+        Intersector.overlaps(tawonShape,bungaBawah) ||
+        Intersector.overlaps(tawonShape,batangAtas) ||
+        Intersector.overlaps(tawonShape,batangBawah);
     }
 
 }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -31,7 +32,36 @@ public class MainScreen extends ScreenAdapter {
 
     //objects
     private Tawon tawon;
-    private Bunga bunga;
+//    private Bunga bunga;
+
+    private Array<Bunga> bungas = new Array<Bunga>();
+
+    private void createNewBunga(){
+        Bunga newBunga = new Bunga(gambar_bungaAtas,gambar_bungaBawah);
+        newBunga.setPosition(WIDTH + Bunga.WIDTH);
+        bungas.add(newBunga);
+    }
+
+    private void checkNeedNewBunga(){
+        if(bungas.size == 0){
+            createNewBunga();
+        }
+        else {
+            Bunga bunga = bungas.peek();
+            if (bunga.getX() < WIDTH - GAP){
+                createNewBunga();
+            }
+        }
+    }
+
+    private void removeBunga(){
+        if (bungas.size > 0){
+            Bunga firstBunga = bungas.first();
+            if (firstBunga.getX() < -Bunga.WIDTH){
+                bungas.removeValue(firstBunga,true);
+            }
+        }
+    }
 
     @Override
     public void show() {
@@ -53,8 +83,8 @@ public class MainScreen extends ScreenAdapter {
         tawon = new Tawon(gambar_tawon);
         tawon.setPosition(WIDTH/2,HEIGHT);
 
-        bunga = new Bunga(gambar_bungaAtas,gambar_bungaBawah);
-        bunga.setPosition(WIDTH);
+//        bunga = new Bunga(gambar_bungaAtas,gambar_bungaBawah);
+//        bunga.setPosition(WIDTH);
     }
 
     @Override
@@ -76,7 +106,10 @@ public class MainScreen extends ScreenAdapter {
         shape.begin(ShapeRenderer.ShapeType.Line);
 
         tawon.drawBody(shape);
-        bunga.drawBunga(shape);
+//        bunga.drawBunga(shape);
+        for(Bunga bunga : bungas){
+            bunga.drawBunga(shape);
+        }
 
         shape.end();
 
@@ -92,15 +125,43 @@ public class MainScreen extends ScreenAdapter {
 
         blokPosisiTawon();
 
-        bunga.update(delta);
+//        bunga.update(delta);
+        updateBungas(delta);
+
+        if (checkTabrakan()){
+            restart();
+        }
+    }
+
+    private void updateBungas(float delta){
+        for(Bunga bunga: bungas){
+            bunga.update(delta);
+        }
+        checkNeedNewBunga();
+        removeBunga();
     }
 
     private void blokPosisiTawon(){
         tawon.setPosition(tawon.getX(), MathUtils.clamp(tawon.getY(),0,HEIGHT));
     }
 
+    private boolean checkTabrakan(){
+        for (Bunga bunga: bungas){
+            if (bunga.isTawonKenak(tawon)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void resize(int width, int height) {
         viewport.update(width,height);
+    }
+
+    private void restart(){
+        //set to default init
+        tawon.setPosition(WIDTH/2,HEIGHT);
+        bungas.clear();
     }
 }

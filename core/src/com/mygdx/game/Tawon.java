@@ -41,6 +41,10 @@ public class Tawon extends Game {
         setPosition(x,y + ySpeed);
     }
 
+    public Circle getBody() {
+        return body;
+    }
+
     public void terbang(){
         ySpeed = KECEPATAN_TERBANG;
         setPosition(x,y+ySpeed);
