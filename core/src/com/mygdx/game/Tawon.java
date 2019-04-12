@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 
@@ -15,6 +16,7 @@ public class Tawon extends Game {
 
     private static final float RADIUS = 24f;
     private Circle body;
+    private final Texture img;
 
     @Override
     public void create() {
@@ -23,6 +25,7 @@ public class Tawon extends Game {
 
     public Tawon(Texture texture) {
         body = new Circle(x, y, RADIUS);
+        img = texture;
     }
 
     public void setPosition(float x, float y){
@@ -34,6 +37,10 @@ public class Tawon extends Game {
 
     public void drawBody(ShapeRenderer shapeRenderer){
         shapeRenderer.circle(body.x,body.y,body.radius);
+    }
+
+    public void drawAsset(Batch batch){
+        batch.draw(img, x-RADIUS*2-10, y-RADIUS*2);
     }
 
     public void update(){

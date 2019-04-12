@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
@@ -25,6 +26,10 @@ public class Bunga {
     private final Rectangle batangAtas;
     private final Rectangle batangBawah;
 
+    private final Texture imgAtas, imgBawah;
+
+    private boolean isThrough = false;
+
     public Bunga(Texture texture1, Texture texture2){
         this.y = MathUtils.random(-400f);
         this.batangBawah = new Rectangle(x,y,LEBAR_BATANG,PANJANG_BATANG);
@@ -32,6 +37,9 @@ public class Bunga {
 
         this.bungaAtas = new Circle(x+batangBawah.width,bungaBawah.y + GAP,RADIUS_BUNGA);
         this.batangAtas = new Rectangle(bungaAtas.x,bungaAtas.y+(RADIUS_BUNGA/2),batangBawah.width,batangBawah.height);
+
+        imgAtas = texture1;
+        imgBawah = texture2;
     }
 
     public void setPosition(float x){
@@ -49,8 +57,6 @@ public class Bunga {
 
         bungaAtas.setX(x + batangAtas.width/2);
         batangAtas.setX(x);
-
-        //Todo: make looping for spawn next obstacle
     }
 
     public void update(float delta){
@@ -64,6 +70,11 @@ public class Bunga {
         shape.rect(batangAtas.x,batangAtas.y,batangAtas.width,batangAtas.height);
     }
 
+    public void drawAsset(Batch batch){
+        batch.draw(imgAtas, bungaAtas.x-2*RADIUS_BUNGA+batangAtas.width, bungaAtas.y-RADIUS_BUNGA);
+        batch.draw(imgBawah, bungaBawah.x-2*RADIUS_BUNGA+batangBawah.width, batangBawah.y+RADIUS_BUNGA);
+    }
+
     public boolean isTawonKenak(Tawon tawon){
         Circle tawonShape = tawon.getBody();
         return
@@ -71,6 +82,14 @@ public class Bunga {
         Intersector.overlaps(tawonShape,bungaBawah) ||
         Intersector.overlaps(tawonShape,batangAtas) ||
         Intersector.overlaps(tawonShape,batangBawah);
+    }
+
+    public void tandaiSudahLewat(){
+        isThrough= true;
+    }
+
+    public boolean isSudahLewat(){
+        return isThrough;
     }
 
 }

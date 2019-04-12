@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -33,8 +35,12 @@ public class MainScreen extends ScreenAdapter {
     //objects
     private Tawon tawon;
 //    private Bunga bunga;
-
     private Array<Bunga> bungas = new Array<Bunga>();
+
+    //score
+    private int score = 0;
+    private BitmapFont font;
+    private GlyphLayout glyph;
 
     private void createNewBunga(){
         Bunga newBunga = new Bunga(gambar_bungaAtas,gambar_bungaBawah);
@@ -83,6 +89,10 @@ public class MainScreen extends ScreenAdapter {
         tawon = new Tawon(gambar_tawon);
         tawon.setPosition(WIDTH/2,HEIGHT);
 
+        //init score
+        font = new BitmapFont();
+        glyph = new GlyphLayout();
+
 //        bunga = new Bunga(gambar_bungaAtas,gambar_bungaBawah);
 //        bunga.setPosition(WIDTH);
     }
@@ -98,6 +108,12 @@ public class MainScreen extends ScreenAdapter {
         batch.setTransformMatrix(camera.view);
         batch.begin();
         batch.draw(background,0,0); //update the screen with textures
+
+        tawon.drawAsset(batch);
+        for(Bunga bunga : bungas){
+            bunga.drawAsset(batch);
+        }
+        setScore();
         batch.end();
 
         //draw objects
@@ -105,11 +121,12 @@ public class MainScreen extends ScreenAdapter {
         shape.setTransformMatrix(camera.view);
         shape.begin(ShapeRenderer.ShapeType.Line);
 
-        tawon.drawBody(shape);
+        //test the shape if you don't need it just disable it
+//        tawon.drawBody(shape);
 //        bunga.drawBunga(shape);
-        for(Bunga bunga : bungas){
-            bunga.drawBunga(shape);
-        }
+//        for(Bunga bunga : bungas){
+//            bunga.drawBunga(shape);
+//        }
 
         shape.end();
 
@@ -119,7 +136,13 @@ public class MainScreen extends ScreenAdapter {
     private void update(float delta){
         tawon.update();
 
+        //button for desktop
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+            tawon.terbang();
+        }
+
+        //button for android
+        if (Gdx.input.isTouched()){
             tawon.terbang();
         }
 
@@ -128,7 +151,9 @@ public class MainScreen extends ScreenAdapter {
 //        bunga.update(delta);
         updateBungas(delta);
 
-        if (checkTabrakan()){
+        updateScore();
+
+        if (checkTabrakan() || tawon.getY() == 0){
             restart();
         }
     }
@@ -154,14 +179,30 @@ public class MainScreen extends ScreenAdapter {
         return false;
     }
 
+    private void updateScore(){
+        Bunga bunga = bungas.first();
+        if(bunga.getX() <= tawon.getX() && !bunga.isSudahLewat()){
+            score++;
+            bunga.tandaiSudahLewat();
+        }
+    }
+
     @Override
     public void resize(int width, int height) {
         viewport.update(width,height);
+    }
+
+    private void setScore(){
+        String scoreString = "Score: "+ Integer.toString(score);
+        glyph.setText(font, scoreString);
+        font.getData().setScale(2f);
+        font.draw(batch,scoreString,100,HEIGHT-500);
     }
 
     private void restart(){
         //set to default init
         tawon.setPosition(WIDTH/2,HEIGHT);
         bungas.clear();
+        score=0;
     }
 }
